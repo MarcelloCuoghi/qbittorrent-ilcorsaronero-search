@@ -4,9 +4,8 @@
 
 import re
 from html.parser import HTMLParser
-import urllib.parse
 
-from helpers import retrieve_url
+from helpers import retrieve_url, download_file
 from novaprinter import prettyPrinter
 
 
@@ -110,6 +109,9 @@ class ilcorsaronero(object):
                     self.current_data["pub_date"] = text
                 # elif self.current_column == 6:
                 #     self.current_data["uploader"] = text
+
+    def download_torrent(self, info):
+        print(download_file(info))
 
     # DO NOT CHANGE the name and parameters of this function
     # This function will be the one called by nova2.py
