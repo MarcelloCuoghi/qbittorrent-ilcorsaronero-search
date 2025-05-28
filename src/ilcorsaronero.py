@@ -131,6 +131,3 @@ class ilcorsaronero(object):
             html = retrieve_url(page_url)
             parser = self.MyHtmlParser(self.url)
             parser.feed(html)
-            for torrent in parser.results:
-                prettyPrinter(torrent)
-            parser.close()
