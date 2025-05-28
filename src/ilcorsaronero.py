@@ -1,4 +1,4 @@
-# VERSION: 1.0
+# VERSION: 1.1
 # AUTHORS: MarcelloCuoghi (https://github.com/MarcelloCuoghi)
 # LICENSE: GPLv3
 
@@ -7,6 +7,8 @@ from html.parser import HTMLParser
 
 from helpers import retrieve_url, download_file
 from novaprinter import prettyPrinter
+import time
+from datetime import datetime
 
 
 class ilcorsaronero(object):
@@ -21,7 +23,6 @@ class ilcorsaronero(object):
         "music": "musica",
         "software": "software",
         "tv": "serie-tv",
-        "other": "altro",
     }
     # IlCorsaroNero's search divided into pages, so we are going to set a limit on how many pages to read
     max_pages = 10
@@ -106,9 +107,13 @@ class ilcorsaronero(object):
                 elif self.current_column == 4:
                     self.current_data["size"] = text
                 elif self.current_column == 5:
-                    self.current_data["pub_date"] = text
-                # elif self.current_column == 6:
-                #     self.current_data["uploader"] = text
+                    # Convert pub_date text to Unix timestamp
+                    fmt = "%Y-%m-%d %H:%M"
+                    try:
+                        dt = datetime.strptime(text, fmt)
+                        self.current_data["pub_date"] = int(time.mktime(dt.timetuple()))
+                    except ValueError:
+                        self.current_data["pub_date"] = text
 
     def download_torrent(self, info):
         print(download_file(info))
