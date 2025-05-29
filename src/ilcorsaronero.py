@@ -140,7 +140,7 @@ class ilcorsaronero(object):
     def search(self, what, cat="all"):
         """Performs search"""
         parser = self.MyHtmlParser(self.url)
-        what = what.replace("%20", "-")
+        what = what.replace("%20", "+")
         cat = self.supported_categories[cat]
 
         for page in range(1, 10):
