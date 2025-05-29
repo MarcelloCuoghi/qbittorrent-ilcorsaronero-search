@@ -1,14 +1,32 @@
 # VERSION: 1.1
 # AUTHORS: MarcelloCuoghi (https://github.com/MarcelloCuoghi)
-# LICENSE: GPLv3
+
+# LICENSING INFORMATION
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in
+# all copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+# SOFTWARE.
 
 import re
 from html.parser import HTMLParser
-
-from helpers import retrieve_url, download_file
-from novaprinter import prettyPrinter
 import time
 from datetime import datetime
+
+from helpers import download_file, retrieve_url
+from novaprinter import prettyPrinter
 
 
 class ilcorsaronero(object):
@@ -16,16 +34,14 @@ class ilcorsaronero(object):
     name = "Il Corsaro Nero"
     supported_categories = {
         "all": "",
-        "boooks": "libri",
         "anime": "animazione",
+        "boooks": "libri",
         "games": "giochi",
         "movies": "film",
         "music": "musica",
         "software": "software",
         "tv": "serie-tv",
     }
-    # IlCorsaroNero's search divided into pages, so we are going to set a limit on how many pages to read
-    max_pages = 10
 
     class MyHtmlParser(HTMLParser):
         """Sub-class for parsing results"""
@@ -72,7 +88,7 @@ class ilcorsaronero(object):
                 and "/torrent/" in attrs["href"]
             ):
                 self.in_link = True
-                self.current_data["desc_link"] = attrs["href"]
+                self.current_data["desc_link"] = f"{self.url}{attrs["href"]}"
             elif self.in_row and tag == "td":
                 self.capture_data = True
             elif self.in_row and tag == "th":
@@ -83,8 +99,9 @@ class ilcorsaronero(object):
                 if "name" in self.current_data:
                     self.current_data["engine_url"] = self.url
                     self.current_data["link"] = self._get_magnet_link(
-                        f"{self.url}{self.current_data.get("desc_link", "")}"
+                        f"{self.current_data.get("desc_link", "")}"
                     )
+                    prettyPrinter(self.current_data)
                     self.results.append(self.current_data)
                 self.in_row = False
             elif tag == "a" and self.in_link:
@@ -126,7 +143,7 @@ class ilcorsaronero(object):
         what = what.replace("%20", "-")
         cat = self.supported_categories[cat]
 
-        for page in range(1, 5):
+        for page in range(1, 10):
             page_url = f"{self.url}/search?q={what}&page={page}&cat={cat}"
             html = retrieve_url(page_url)
             parser = self.MyHtmlParser(self.url)
